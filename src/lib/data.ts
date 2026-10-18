@@ -17,6 +17,7 @@ export type RecipeMatch = {
   description: string | null;
   prep_minutes: number | null;
   servings: number | null;
+  image_url: string | null;
   total: number;
   matched: number;
   missing: string[];

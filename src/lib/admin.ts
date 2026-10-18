@@ -22,8 +22,21 @@ export type AdminRecipeSummary = {
   slug: string;
   prep_minutes: number | null;
   servings: number | null;
+  image_url: string | null;
   titles: Partial<Record<Locale, string>>;
   ingredient_count: number;
+};
+
+export type AdminIngredientDetail = AdminIngredient & {
+  recipes: {
+    id: number;
+    slug: string;
+    title: string;
+    image_url: string | null;
+    quantity: number | null;
+    unit: string | null;
+    optional: boolean;
+  }[];
 };
 
 export type AdminRecipe = {
@@ -57,6 +70,8 @@ export type RecipeInput = {
   translations: Record<Locale, { title: string; description: string; steps: string[] }>;
   ingredients: { ingredient_id: number; quantity: number | null; unit: string; optional: boolean }[];
 };
+
+export const IMAGE_MAX_BYTES = 512 * 1024;
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
 

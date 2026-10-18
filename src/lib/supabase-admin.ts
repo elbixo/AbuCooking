@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
-import type { AdminIngredient, AdminRecipe, AdminRecipeSummary } from "./admin";
+import type { AdminIngredient, AdminIngredientDetail, AdminRecipe, AdminRecipeSummary } from "./admin";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -24,9 +24,31 @@ async function rpc<T>(fn: string, args?: Record<string, unknown>): Promise<T> {
 export const adminDb = {
   listIngredients: () => rpc<AdminIngredient[]>("admin_list_ingredients"),
   listRecipes: () => rpc<AdminRecipeSummary[]>("admin_list_recipes"),
+  getIngredient: (id: number) => rpc<AdminIngredientDetail | null>("admin_get_ingredient", { p_id: id }),
   getRecipe: (id: number) => rpc<AdminRecipe | null>("admin_get_recipe", { p_id: id }),
   saveIngredient: (p: unknown) => rpc<number>("admin_save_ingredient", { p }),
   saveRecipe: (p: unknown) => rpc<number>("admin_save_recipe", { p }),
   deleteRecipe: (id: number) => rpc<null>("admin_delete_recipe", { p_id: id }),
   deleteIngredient: (id: number) => rpc<null>("admin_delete_ingredient", { p_id: id }),
+};
+
+const BUCKET = "recipe-images";
+
+export const adminStorage = {
+  async upload(file: File): Promise<string> {
+    const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const storage = client().storage.from(BUCKET);
+    const { error } = await storage.upload(path, file, { contentType: file.type, cacheControl: "31536000" });
+    if (error) throw new Error(`No se pudo subir la imagen: ${error.message}`);
+    return storage.getPublicUrl(path).data.publicUrl;
+  },
+
+  // Borra la imagen si es nuestra (ignora URLs externas y errores: no debe bloquear el guardado)
+  async remove(publicUrl: string | null | undefined): Promise<void> {
+    const marker = `/storage/v1/object/public/${BUCKET}/`;
+    const idx = publicUrl?.indexOf(marker) ?? -1;
+    if (!publicUrl || idx < 0) return;
+    await client().storage.from(BUCKET).remove([publicUrl.slice(idx + marker.length)]);
+  },
 };

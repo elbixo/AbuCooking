@@ -22,6 +22,15 @@ export default async function RecipePage({ params, searchParams }: Props) {
         ← Volver a los resultados
       </Link>
 
+      {recipe.image_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={recipe.image_url}
+          alt={recipe.title}
+          className="mt-4 aspect-[16/9] w-full rounded-2xl object-cover"
+        />
+      )}
+
       <h1 className="mt-4 text-3xl font-bold tracking-tight text-stone-900">{recipe.title}</h1>
       {recipe.description && <p className="mt-2 text-stone-600">{recipe.description}</p>}
       <p className="mt-3 flex gap-4 text-sm text-stone-500">

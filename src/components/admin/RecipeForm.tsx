@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import IngredientCombobox from "./IngredientCombobox";
 import IngredientForm from "./IngredientForm";
+import ImageField from "./ImageField";
 import { saveRecipe } from "@/app/admin/actions";
 import {
   LOCALES,
@@ -145,10 +146,12 @@ export default function RecipeForm({ initial, ingredients: initialIngredients }:
             Raciones
             <input type="number" min={1} value={servings} onChange={(e) => setServings(e.target.value)} className="input mt-1" />
           </label>
-          <label className="block text-sm sm:col-span-4">
-            URL de la imagen <span className="text-stone-400">(opcional)</span>
-            <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="input mt-1" />
-          </label>
+          <div className="text-sm sm:col-span-4">
+            <p className="mb-2">
+              Imagen <span className="text-stone-400">(opcional)</span>
+            </p>
+            <ImageField value={imageUrl} onChange={setImageUrl} />
+          </div>
         </section>
 
         <section className="card">

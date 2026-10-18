@@ -11,7 +11,8 @@ Dinos qué ingredientes tienes en casa y te proponemos recetas.
 2. Abre **SQL Editor** → **New query**, pega el contenido de
    `supabase/migrations/20261018000000_init.sql` y pulsa **Run**.
 3. Abre otra query, pega `supabase/seed.sql` y pulsa **Run**.
-4. Abre otra query, pega `supabase/migrations/20261019000000_admin.sql` y pulsa **Run**.
+4. Haz lo mismo con `supabase/migrations/20261019000000_admin.sql` y `supabase/migrations/20261020000000_images.sql`
+   (esta última crea el bucket `recipe-images` de Storage para las fotos).
 5. En **Project Settings → API Keys** copia la *Project URL*, la clave *publishable* (o *anon*) y la clave *secret* (o *service_role*).
 
 > Cada vez que se añada un archivo nuevo en `supabase/migrations/`, ejecútalo igual en el SQL Editor (en orden).
@@ -35,8 +36,12 @@ Abre http://localhost:3000
 
 En local (`npm run dev`) tienes `/admin` (enlace "Administración" arriba a la derecha):
 
-- **Recetas**: crear, editar y borrar. Título, descripción y pasos en español (obligatorio), francés e inglés.
-- **Ingredientes**: crear, editar y borrar, con nombre y sinónimos en los tres idiomas.
+- **Recetas**: buscar, ordenar (título, nº de ingredientes, tiempo), crear, editar y borrar.
+  Título, descripción y pasos en español (obligatorio), francés e inglés. Imagen opcional.
+- **Ingredientes**: buscar, ordenar por nombre en cualquiera de los 3 idiomas o por nº de recetas.
+  Al pulsar uno se ven las recetas que lo usan y se puede editar (nombre y sinónimos en los 3 idiomas).
+- **Imágenes**: el navegador las reduce a 800 px en WebP antes de subirlas (normalmente 30-100 KB;
+  máximo 512 KB). Se guardan en Supabase Storage y se borran al cambiarlas o al borrar la receta.
 - Al añadir ingredientes a una receta se busca entre los existentes (en cualquier idioma o sinónimo).
   Si no existe, ofrece **«+ Crear ingrediente»** y lo da de alta sin salir de la receta.
 
