@@ -11,14 +11,17 @@ Dinos qué ingredientes tienes en casa y te proponemos recetas.
 2. Abre **SQL Editor** → **New query**, pega el contenido de
    `supabase/migrations/20261018000000_init.sql` y pulsa **Run**.
 3. Abre otra query, pega `supabase/seed.sql` y pulsa **Run**.
-4. En **Project Settings → API** (o **Data API**) copia la *Project URL* y la clave *anon* / *publishable*.
+4. Abre otra query, pega `supabase/migrations/20261019000000_admin.sql` y pulsa **Run**.
+5. En **Project Settings → API Keys** copia la *Project URL*, la clave *publishable* (o *anon*) y la clave *secret* (o *service_role*).
+
+> Cada vez que se añada un archivo nuevo en `supabase/migrations/`, ejecútalo igual en el SQL Editor (en orden).
 
 ### 2. Arrancar la web en local
 ```powershell
 git clone https://github.com/<tu-usuario>/AbuCooking.git
 cd AbuCooking
 npm install
-Copy-Item .env.example .env.local   # y rellena las dos variables
+Copy-Item .env.example .env.local   # y rellena las tres variables
 npm run dev
 ```
 Abre http://localhost:3000
@@ -27,6 +30,19 @@ Abre http://localhost:3000
 1. En https://vercel.com/new importa el repositorio de GitHub.
 2. Añade las variables `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 3. **Deploy**. Cada `git push` a `main` vuelve a publicar automáticamente.
+
+## Panel de administración
+
+En local (`npm run dev`) tienes `/admin` (enlace "Administración" arriba a la derecha):
+
+- **Recetas**: crear, editar y borrar. Título, descripción y pasos en español (obligatorio), francés e inglés.
+- **Ingredientes**: crear, editar y borrar, con nombre y sinónimos en los tres idiomas.
+- Al añadir ingredientes a una receta se busca entre los existentes (en cualquier idioma o sinónimo).
+  Si no existe, ofrece **«+ Crear ingrediente»** y lo da de alta sin salir de la receta.
+
+⚠️ Todavía **no tiene autenticación**. Por eso solo funciona en desarrollo: en producción `/admin` devuelve 404
+(salvo que se defina `ADMIN_ENABLED=true`, que no debe hacerse hasta tener login).
+Escribe en la base de datos desde el servidor con `SUPABASE_SERVICE_ROLE_KEY`, que nunca llega al navegador.
 
 ## Cómo está organizado
 
@@ -37,8 +53,11 @@ supabase/
 src/
   app/page.tsx            Buscador + resultados (lee ?i=1,2,3 de la URL)
   app/receta/[slug]/      Detalle de receta, marca lo que tienes y lo que falta
+  app/admin/              Panel de administración (+ actions.ts: server actions)
   components/             Selector de ingredientes y tarjeta de receta
-  lib/data.ts             Acceso a datos (llamadas RPC a Supabase)
+  components/admin/       Formularios de receta e ingrediente
+  lib/data.ts             Lectura pública (clave publishable)
+  lib/supabase-admin.ts   Lectura/escritura de admin (clave secreta, solo servidor)
 ```
 
 ### Modelo de datos
@@ -51,5 +70,5 @@ La búsqueda (`search_recipes`) trabaja con IDs de ingredientes, así que no dep
 Ordena por el % de ingredientes necesarios que tienes, sin contar básicos ni opcionales.
 
 ### Añadir recetas
-Añade filas en `seed.sql` siguiendo el mismo formato (o insértalas desde el Table Editor de Supabase).
-Para traducir, basta con añadir filas con `locale = 'fr'` / `'en'` en las tablas `*_translation`.
+Desde `/admin`. Las traducciones al francés e inglés se guardan ya, aunque la web pública
+de momento solo muestra español.

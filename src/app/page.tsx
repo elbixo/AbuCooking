@@ -11,7 +11,7 @@ export default async function Home({ searchParams }: Props) {
   const query = selected.length ? `?i=${selected.join(",")}` : "";
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-3xl space-y-8">
       <section>
         <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">¿Qué tienes en la nevera?</h1>
         <p className="mt-2 text-stone-600">

@@ -12,3 +12,10 @@ export function formatQuantity(quantity: number | null, unit: string | null): st
   const n = frac ? `${whole || ""}${frac}` : String(quantity);
   return unit ? `${n} ${unit}` : n;
 }
+
+// "Tortilla de Patatas" -> "tortilla-de-patatas"
+export function slugify(s: string): string {
+  return normalize(s)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

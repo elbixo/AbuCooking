@@ -17,7 +17,7 @@ export default async function RecipePage({ params, searchParams }: Props) {
   const backHref = have.size ? `/?i=${[...have].join(",")}` : "/";
 
   return (
-    <article>
+    <article className="mx-auto max-w-3xl">
       <Link href={backHref} className="text-sm text-orange-600 hover:underline">
         ← Volver a los resultados
       </Link>
