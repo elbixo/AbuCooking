@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist } from "next/font/google";
 import { signOut } from "./auth/actions";
+import SectionNav from "@/components/SectionNav";
 import Telemetry from "@/components/Telemetry";
 import { getCurrentUser } from "@/lib/auth";
 import { isPrivateMode } from "@/lib/site";
@@ -66,6 +67,7 @@ export default async function RootLayout({
               )}
             </nav>
           </div>
+          <SectionNav />
         </header>
         <main className="px-4 py-8">{children}</main>
         <Telemetry />

@@ -1,22 +1,35 @@
 import Link from "next/link";
+import FavoriteButton from "./FavoriteButton";
 import type { RecipeMatch } from "@/lib/data";
 
-export default function RecipeCard({ recipe, query }: { recipe: RecipeMatch; query: string }) {
+type Props = {
+  recipe: RecipeMatch;
+  query: string;
+  favorite: boolean;
+  loggedIn: boolean;
+};
+
+export default function RecipeCard({ recipe, query, favorite, loggedIn }: Props) {
   const complete = recipe.missing.length === 0;
   const pct = Math.round((recipe.matched / recipe.total) * 100);
 
   return (
-    <Link
-      href={`/receta/${recipe.slug}${query}`}
-      className="block overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-    >
+    <article className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       {recipe.image_url && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={recipe.image_url} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
       )}
+      <div className="absolute right-3 top-3 z-10">
+        <FavoriteButton recipeId={recipe.id} initial={favorite} loggedIn={loggedIn} />
+      </div>
       <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-lg font-semibold text-stone-900">{recipe.title}</h3>
+        <div className={`flex items-start justify-between gap-3 ${recipe.image_url ? "" : "pr-10"}`}>
+          {/* El enlace cubre toda la tarjeta (after:inset-0) salvo el corazón, que queda por encima */}
+          <h3 className="text-lg font-semibold text-stone-900">
+            <Link href={`/receta/${recipe.slug}${query}`} className="after:absolute after:inset-0">
+              {recipe.title}
+            </Link>
+          </h3>
           {recipe.prep_minutes && (
             <span className="shrink-0 text-sm text-stone-500">{recipe.prep_minutes} min</span>
           )}
@@ -52,6 +65,6 @@ export default function RecipeCard({ recipe, query }: { recipe: RecipeMatch; que
           )}
         </p>
       </div>
-    </Link>
+    </article>
   );
 }

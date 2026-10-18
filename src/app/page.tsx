@@ -1,7 +1,9 @@
 import IngredientPicker from "@/components/IngredientPicker";
 import RecipeCard from "@/components/RecipeCard";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 import { listIngredients, parseIds, searchQuery, searchRecipes } from "@/lib/data";
+import { favoriteIds } from "@/lib/favorites";
 
 type Props = { searchParams: Promise<{ i?: string | string[]; solo?: string; aviso?: string }> };
 
@@ -9,7 +11,12 @@ export default async function Home({ searchParams }: Props) {
   const params = await searchParams;
   const selected = parseIds(params.i);
   const onlyComplete = params.solo === "1";
-  const [ingredients, recipes] = await Promise.all([listIngredients(), searchRecipes(selected, onlyComplete)]);
+  const user = await getCurrentUser();
+  const [ingredients, recipes, favorites] = await Promise.all([
+    listIngredients(),
+    searchRecipes(selected, onlyComplete),
+    user && selected.length ? favoriteIds() : Promise.resolve(new Set<number>()),
+  ]);
   const pantry = ingredients.filter((i) => i.is_pantry).map((i) => i.name);
   const query = searchQuery(selected, onlyComplete);
 
@@ -56,7 +63,7 @@ export default async function Home({ searchParams }: Props) {
           )}
           <div className="grid gap-4 sm:grid-cols-2">
             {recipes.map((r) => (
-              <RecipeCard key={r.id} recipe={r} query={query} />
+              <RecipeCard key={r.id} recipe={r} query={query} favorite={favorites.has(r.id)} loggedIn={Boolean(user)} />
             ))}
           </div>
         </section>

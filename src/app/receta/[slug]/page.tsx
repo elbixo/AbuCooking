@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import FavoriteButton from "@/components/FavoriteButton";
+import { getCurrentUser } from "@/lib/auth";
 import { getRecipe, parseIds, searchQuery } from "@/lib/data";
+import { favoriteIds } from "@/lib/favorites";
 import { formatQuantity } from "@/lib/text";
 
 type Props = {
@@ -12,8 +15,9 @@ export default async function RecipePage({ params, searchParams }: Props) {
   const { slug } = await params;
   const query = await searchParams;
   const have = new Set(parseIds(query.i));
-  const recipe = await getRecipe(slug);
+  const [recipe, user] = await Promise.all([getRecipe(slug), getCurrentUser()]);
   if (!recipe) notFound();
+  const isFavorite = user ? (await favoriteIds()).has(recipe.id) : false;
 
   const backHref = `/${searchQuery(have, query.solo === "1")}`;
 
@@ -32,7 +36,10 @@ export default async function RecipePage({ params, searchParams }: Props) {
         />
       )}
 
-      <h1 className="mt-4 text-3xl font-bold tracking-tight text-stone-900">{recipe.title}</h1>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <h1 className="text-3xl font-bold tracking-tight text-stone-900">{recipe.title}</h1>
+        <FavoriteButton recipeId={recipe.id} initial={isFavorite} loggedIn={Boolean(user)} size="lg" />
+      </div>
       {recipe.description && <p className="mt-2 text-stone-600">{recipe.description}</p>}
       <p className="mt-3 flex gap-4 text-sm text-stone-500">
         {recipe.prep_minutes && <span>⏱ {recipe.prep_minutes} min</span>}

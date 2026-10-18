@@ -56,9 +56,11 @@ Cuentas con email y contraseña (Supabase Auth). Registro libre en `/registro`.
 | Rol | Puede |
 |---|---|
 | Visitante sin cuenta | Buscar recetas (en modo privado: nada, solo entrar o registrarse) |
-| **Básico** (toda cuenta nueva) | Buscar recetas |
+| **Básico** (toda cuenta nueva) | Buscar recetas y guardar favoritas |
 | **Administrador** | Todo, incluido el panel `/admin` |
 
+- **Mis favoritas** (`/favoritas`): el corazón de cada receta la guarda en la cuenta del usuario.
+  Cada usuario solo puede ver y cambiar las suyas (RLS en la tabla `favorite`).
 - **Mi cuenta** (`/cuenta`, pulsando tu email arriba): ver tu tipo de cuenta y cambiar la contraseña
   (pide la actual).
 - **¿Olvidaste tu contraseña?** (`/recuperar`): envía un email con un enlace de un solo uso para elegir
