@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import BackLink from "@/components/BackLink";
 import FavoriteButton from "@/components/FavoriteButton";
 import { getCurrentUser } from "@/lib/auth";
 import { getRecipe, parseIds, searchQuery } from "@/lib/data";
@@ -23,9 +23,7 @@ export default async function RecipePage({ params, searchParams }: Props) {
 
   return (
     <article className="mx-auto max-w-3xl">
-      <Link href={backHref} className="text-sm text-orange-600 hover:underline">
-        ← Volver a los resultados
-      </Link>
+      <BackLink fallback={backHref} />
 
       {recipe.image_url && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -38,7 +36,7 @@ export default async function RecipePage({ params, searchParams }: Props) {
 
       <div className="mt-4 flex items-start justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight text-stone-900">{recipe.title}</h1>
-        <FavoriteButton recipeId={recipe.id} initial={isFavorite} loggedIn={Boolean(user)} size="lg" />
+        <FavoriteButton recipeId={recipe.id} recipeTitle={recipe.title} initial={isFavorite} loggedIn={Boolean(user)} size="lg" />
       </div>
       {recipe.description && <p className="mt-2 text-stone-600">{recipe.description}</p>}
       <p className="mt-3 flex gap-4 text-sm text-stone-500">

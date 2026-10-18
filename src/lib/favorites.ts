@@ -1,20 +1,11 @@
 import "server-only";
-import { LOCALE } from "./data";
+import { LOCALE, type RecipeSummary } from "./data";
 import { createSessionClient } from "./supabase-server";
 
 // Se ejecutan con la sesión del usuario: la base de datos (auth.uid() + RLS)
 // garantiza que cada uno solo ve y cambia sus propias favoritas.
 
-export type FavoriteRecipe = {
-  id: number;
-  slug: string;
-  title: string;
-  description: string | null;
-  prep_minutes: number | null;
-  servings: number | null;
-  image_url: string | null;
-  favorited_at: string;
-};
+export type FavoriteRecipe = RecipeSummary & { favorited_at: string };
 
 export async function listFavorites(): Promise<FavoriteRecipe[]> {
   const supabase = await createSessionClient();

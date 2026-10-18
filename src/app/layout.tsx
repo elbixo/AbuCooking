@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist } from "next/font/google";
 import { signOut } from "./auth/actions";
+import NavigationTracker from "@/components/NavigationTracker";
 import SectionNav from "@/components/SectionNav";
 import Telemetry from "@/components/Telemetry";
+import { ConfirmProvider } from "@/components/ui/ConfirmProvider";
 import { getCurrentUser } from "@/lib/auth";
 import { isPrivateMode } from "@/lib/site";
 import "./globals.css";
@@ -69,7 +71,10 @@ export default async function RootLayout({
           </div>
           <SectionNav />
         </header>
-        <main className="px-4 py-8">{children}</main>
+        <main className="px-4 py-8">
+          <ConfirmProvider>{children}</ConfirmProvider>
+        </main>
+        <NavigationTracker />
         <Telemetry />
       </body>
     </html>
