@@ -38,7 +38,10 @@ export default async function RootLayout({
                       Administración
                     </Link>
                   )}
-                  <span className="hidden text-stone-400 sm:inline">{user.email}</span>
+                  <Link href="/cuenta" className="text-stone-600 hover:text-orange-700">
+                    <span className="hidden sm:inline">{user.email}</span>
+                    <span className="sm:hidden">Mi cuenta</span>
+                  </Link>
                   <form action={signOut}>
                     <button type="submit" className="text-stone-600 hover:text-orange-700">
                       Salir

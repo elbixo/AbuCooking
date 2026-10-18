@@ -48,6 +48,14 @@ export default function AuthForm({ mode, next, initialError }: Props) {
         </label>
       )}
 
+      {isLogin && (
+        <p className="-mt-2 text-right text-sm">
+          <Link href="/recuperar" className="text-stone-500 hover:text-orange-700 hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </p>
+      )}
+
       {state.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>}
 
       <button type="submit" disabled={pending} className="btn-primary w-full">

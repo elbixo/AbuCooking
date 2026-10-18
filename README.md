@@ -42,6 +42,14 @@ Cuentas con email y contraseña (Supabase Auth). Registro libre en `/registro`.
 | **Básico** (toda cuenta nueva) | Buscar recetas |
 | **Administrador** | Todo, incluido el panel `/admin` |
 
+- **Mi cuenta** (`/cuenta`, pulsando tu email arriba): ver tu tipo de cuenta y cambiar la contraseña
+  (pide la actual).
+- **¿Olvidaste tu contraseña?** (`/recuperar`): envía un email con un enlace de un solo uso para elegir
+  una nueva. El mensaje es el mismo exista o no la cuenta, para no revelar qué emails están registrados.
+
+**Contraseñas:** no se guardan en nuestras tablas ni pasan por nuestro código salvo en tránsito (HTTPS).
+Las gestiona Supabase Auth, que solo guarda un hash bcrypt en `auth.users.encrypted_password`.
+
 **Primer administrador:** regístrate en la web y ejecuta en el SQL Editor de Supabase:
 ```sql
 update profile set role = 'admin' where email = 'tu@email.com';
@@ -81,6 +89,7 @@ src/
   app/receta/[slug]/      Detalle de receta, marca lo que tienes y lo que falta
   app/admin/              Panel de administración (+ actions.ts: server actions)
   app/login, app/registro Entrar y crear cuenta (app/auth: acciones y callback del email)
+  app/recuperar, app/cuenta  Recuperar contraseña y "Mi cuenta"
   middleware.ts           Refresca la sesión de Supabase en cada petición
   components/             Selector de ingredientes y tarjeta de receta
   components/admin/       Formularios de receta e ingrediente
