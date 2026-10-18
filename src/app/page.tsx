@@ -46,7 +46,9 @@ export default async function Home({ searchParams }: Props) {
       {selected.length > 0 && (
         <section>
           <h2 className="mb-4 text-xl font-semibold text-stone-900">
-            {recipes.length
+            {recipes.length >= 50
+              ? "Las 50 recetas que mejor encajan"
+              : recipes.length
               ? `${recipes.length} ${recipes.length === 1 ? "receta" : "recetas"} para ti`
               : onlyComplete
                 ? "No hay recetas solo con esos ingredientes"
