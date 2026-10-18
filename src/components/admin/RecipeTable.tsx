@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import DeleteButton from "./DeleteButton";
+import AuditCell from "./AuditCell";
 import TranslationBadges from "./TranslationBadges";
 import { SearchBox, SortHeader } from "./ListControls";
-import { compareNumber, compareText, useListParams } from "./useListParams";
+import { compareDate, compareNumber, compareText, useListParams } from "./useListParams";
 import { deleteRecipe } from "@/app/admin/actions";
 import type { AdminRecipeSummary } from "@/lib/admin";
 import { normalize } from "@/lib/text";
 
-const SORTS = ["title", "ingredients", "time"] as const;
+const SORTS = ["title", "ingredients", "time", "updated"] as const;
 type SortKey = (typeof SORTS)[number];
 
 export default function RecipeTable({ recipes }: { recipes: AdminRecipeSummary[] }) {
@@ -24,6 +25,7 @@ export default function RecipeTable({ recipes }: { recipes: AdminRecipeSummary[]
     return [...filtered].sort((a, b) => {
       if (sort === "ingredients") return compareNumber(a.ingredient_count, b.ingredient_count, dir);
       if (sort === "time") return compareNumber(a.prep_minutes, b.prep_minutes, dir);
+      if (sort === "updated") return compareDate(a.updated_at, b.updated_at, dir);
       return compareText(a.titles.es ?? a.slug, b.titles.es ?? b.slug, dir);
     });
   }, [recipes, query, sort, dir]);
@@ -50,6 +52,7 @@ export default function RecipeTable({ recipes }: { recipes: AdminRecipeSummary[]
               <th className="px-4 py-3 uppercase tracking-wide">Idiomas</th>
               {header("ingredients", "Ingredientes")}
               {header("time", "Tiempo")}
+              {header("updated", "Últ. modificación")}
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -77,6 +80,9 @@ export default function RecipeTable({ recipes }: { recipes: AdminRecipeSummary[]
                   </td>
                   <td className="px-4 py-3">{r.ingredient_count}</td>
                   <td className="px-4 py-3">{r.prep_minutes ? `${r.prep_minutes} min` : "—"}</td>
+                  <td className="px-4 py-3">
+                    <AuditCell audit={r} />
+                  </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     <Link href={`/receta/${r.slug}`} className="mr-4 text-sm text-stone-500 hover:underline">
                       Ver

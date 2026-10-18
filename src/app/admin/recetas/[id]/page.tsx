@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import AuditInfo from "@/components/admin/AuditInfo";
 import RecipeForm from "@/components/admin/RecipeForm";
 import { adminDb } from "@/lib/supabase-admin";
 
@@ -10,9 +11,12 @@ export default async function EditRecipe({ params }: { params: Promise<{ id: str
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-stone-900">
+      <h1 className="mb-4 text-2xl font-bold text-stone-900">
         Editar: {recipe.translations.es?.title ?? recipe.slug}
       </h1>
+      <div className="mb-6">
+        <AuditInfo audit={recipe} />
+      </div>
       <RecipeForm key={recipe.id} initial={recipe} ingredients={ingredients} />
     </div>
   );

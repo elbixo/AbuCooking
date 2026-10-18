@@ -9,7 +9,15 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   en: "Inglés",
 };
 
-export type AdminIngredient = {
+// Quién y cuándo creó / modificó por última vez (null = sin datos o importación)
+export type Audit = {
+  created_at: string | null;
+  created_by_email: string | null;
+  updated_at: string | null;
+  updated_by_email: string | null;
+};
+
+export type AdminIngredient = Audit & {
   id: number;
   slug: string;
   is_pantry: boolean;
@@ -17,7 +25,7 @@ export type AdminIngredient = {
   recipe_count: number;
 };
 
-export type AdminRecipeSummary = {
+export type AdminRecipeSummary = Audit & {
   id: number;
   slug: string;
   prep_minutes: number | null;
@@ -39,7 +47,7 @@ export type AdminIngredientDetail = AdminIngredient & {
   }[];
 };
 
-export type AdminRecipe = {
+export type AdminRecipe = Audit & {
   id: number;
   slug: string;
   prep_minutes: number | null;
