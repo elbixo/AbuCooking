@@ -2,6 +2,8 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import InfoTooltip from "./ui/InfoTooltip";
+import Switch from "./ui/Switch";
 import { searchQuery, type Ingredient } from "@/lib/data";
 import { normalize } from "@/lib/text";
 
@@ -136,22 +138,20 @@ export default function IngredientPicker({ ingredients, initialSelected, initial
         )}
       </div>
 
-      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3">
-        <input
-          type="checkbox"
-          checked={onlyComplete}
-          onChange={(e) => toggleOnlyComplete(e.target.checked)}
-          className="mt-0.5 h-5 w-5 accent-orange-500"
-        />
-        <span>
-          <span className="block font-medium text-stone-900">Solo con lo que tengo</span>
-          <span className="block text-sm text-stone-500">
-            {onlyComplete
-              ? "Solo recetas que puedes hacer sin comprar nada."
-              : "Incluye recetas a las que les falta algún ingrediente."}
-          </span>
+      <div className="mt-4 flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3">
+        <Switch checked={onlyComplete} onChange={toggleOnlyComplete} id="only-complete" aria-labelledby="only-complete-label" />
+        <span
+          id="only-complete-label"
+          onClick={() => toggleOnlyComplete(!onlyComplete)}
+          className="cursor-pointer select-none font-medium text-stone-900"
+        >
+          Cocina solo con lo que tengo
         </span>
-      </label>
+        <InfoTooltip
+          label="¿Qué significa «Cocina solo con lo que tengo»?"
+          text="Esta opción solo buscará recetas de las que tengas todos los ingredientes, para que no tengas que comprar nada. Si la desactivas, también verás recetas a las que les falta algún ingrediente. Los básicos de despensa (sal, aceite…) y los ingredientes opcionales no cuentan."
+        />
+      </div>
 
       <button
         type="button"
