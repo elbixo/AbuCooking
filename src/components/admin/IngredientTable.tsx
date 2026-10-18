@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import DeleteButton from "./DeleteButton";
+import AuditCell from "./AuditCell";
 import TranslationBadges from "./TranslationBadges";
 import { SearchBox, SortHeader } from "./ListControls";
-import { compareNumber, compareText, useListParams } from "./useListParams";
+import { compareDate, compareNumber, compareText, useListParams } from "./useListParams";
 import { deleteIngredient } from "@/app/admin/actions";
 import { ingredientLabel, type AdminIngredient } from "@/lib/admin";
 import { normalize } from "@/lib/text";
 
-const SORTS = ["es", "fr", "en", "recipes"] as const;
+const SORTS = ["es", "fr", "en", "recipes", "updated"] as const;
 type SortKey = (typeof SORTS)[number];
 
 export default function IngredientTable({ ingredients }: { ingredients: AdminIngredient[] }) {
@@ -28,7 +29,9 @@ export default function IngredientTable({ ingredients }: { ingredients: AdminIng
     return [...filtered].sort((a, b) =>
       sort === "recipes"
         ? compareNumber(a.recipe_count, b.recipe_count, dir)
-        : compareText(a.translations[sort]?.name, b.translations[sort]?.name, dir),
+        : sort === "updated"
+          ? compareDate(a.updated_at, b.updated_at, dir)
+          : compareText(a.translations[sort]?.name, b.translations[sort]?.name, dir),
     );
   }, [ingredients, query, sort, dir]);
 
@@ -54,6 +57,7 @@ export default function IngredientTable({ ingredients }: { ingredients: AdminIng
               {header("en", "Inglés")}
               <th className="px-4 py-3 uppercase tracking-wide">Idiomas</th>
               {header("recipes", "Recetas")}
+              {header("updated", "Últ. modificación")}
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -75,6 +79,9 @@ export default function IngredientTable({ ingredients }: { ingredients: AdminIng
                   <Link href={`/admin/ingredientes/${i.id}`} className="text-orange-700 hover:underline">
                     {i.recipe_count}
                   </Link>
+                </td>
+                <td className="px-4 py-3">
+                  <AuditCell audit={i} />
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right">
                   <Link href={`/admin/ingredientes/${i.id}`} className="mr-4 text-sm text-orange-700 hover:underline">

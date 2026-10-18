@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AuditInfo from "@/components/admin/AuditInfo";
 import IngredientEditor from "@/components/admin/IngredientEditor";
 import { LOCALES, LOCALE_LABELS, ingredientLabel } from "@/lib/admin";
 import { adminDb } from "@/lib/supabase-admin";
@@ -25,6 +26,8 @@ export default async function IngredientDetail({ params }: { params: Promise<{ i
           {ingredient.is_pantry && " · básico de despensa"}
         </p>
       </div>
+
+      <AuditInfo audit={ingredient} />
 
       <section>
         <h2 className="mb-3 text-lg font-semibold text-stone-900">Editar ingrediente</h2>

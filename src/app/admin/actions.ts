@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { isAdmin } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/auth";
 import { adminDb, adminStorage } from "@/lib/supabase-admin";
 import {
   IMAGE_MAX_BYTES,
@@ -24,13 +24,18 @@ async function run<T>(fn: () => Promise<T>): Promise<ActionResult<T>> {
   }
 }
 
+// Añade quién hace el cambio (auditoría). Lo pone siempre el servidor, nunca el navegador.
+async function withActor<T extends object>(input: T): Promise<T & { actor_id: string | null }> {
+  return { ...input, actor_id: (await getCurrentUser())?.id ?? null };
+}
+
 export async function saveIngredient(input: IngredientInput): Promise<ActionResult<AdminIngredient>> {
   const missing = LOCALES.filter((l) => !input.translations[l]?.name.trim());
   if (missing.length) {
     return { ok: false, error: `Falta el nombre en: ${missing.join(", ").toUpperCase()}` };
   }
   return run(async () => {
-    const id = await adminDb.saveIngredient(input);
+    const id = await adminDb.saveIngredient(await withActor(input));
     const saved = (await adminDb.listIngredients()).find((i) => i.id === id);
     if (!saved) throw new Error("No se encontró el ingrediente guardado");
     return saved;
@@ -46,7 +51,7 @@ export async function saveRecipe(input: RecipeInput): Promise<ActionResult<numbe
   }
   return run(async () => {
     const previous = input.id ? await adminDb.getRecipe(input.id) : null;
-    const id = await adminDb.saveRecipe(input);
+    const id = await adminDb.saveRecipe(await withActor(input));
     if (previous?.image_url && previous.image_url !== input.image_url) {
       await adminStorage.remove(previous.image_url);
     }

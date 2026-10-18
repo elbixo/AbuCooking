@@ -54,3 +54,8 @@ export function compareNumber(a: number | null | undefined, b: number | null | u
   if (b == null) return -1;
   return dir === "asc" ? a - b : b - a;
 }
+
+// Fechas ISO; las vacías siempre al final
+export function compareDate(a: string | null | undefined, b: string | null | undefined, dir: SortDir): number {
+  return compareNumber(a ? Date.parse(a) : null, b ? Date.parse(b) : null, dir);
+}
