@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { isPrivateMode, isPublicPath } from "@/lib/site";
 
 // Refresca la sesión de Supabase en cada petición (renueva el token si ha caducado)
+// y, en modo privado, manda al login a quien no tenga sesión
 export async function middleware(request: NextRequest) {
   // Ruta actual, para que el login pueda devolver al usuario a la página que pidió
   request.headers.set("x-pathname", request.nextUrl.pathname + request.nextUrl.search);
@@ -22,7 +24,15 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
+
+  const { pathname, search } = request.nextUrl;
+  if (isPrivateMode() && !data.user && !isPublicPath(pathname)) {
+    const login = request.nextUrl.clone();
+    login.pathname = "/login";
+    login.search = pathname === "/" && !search ? "" : `?next=${encodeURIComponent(pathname + search)}`;
+    return NextResponse.redirect(login);
+  }
   return response;
 }
 

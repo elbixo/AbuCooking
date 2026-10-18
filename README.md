@@ -27,10 +27,27 @@ npm run dev
 ```
 Abre http://localhost:3000
 
-### 3. Publicar en Vercel
+### 3. Publicar en Vercel (modo privado, solo por invitación)
 1. En https://vercel.com/new importa el repositorio de GitHub.
-2. Añade las variables `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+2. En **Environment Variables** añade:
+
+   | Variable | Valor |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto de Supabase |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave *publishable* / *anon* |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Clave *secret* / *service_role* |
+   | `PRIVATE_MODE` | `true` |
+   | `INVITE_CODE` | El código que darás a tus invitados (p. ej. `PAELLA2026`) |
+
 3. **Deploy**. Cada `git push` a `main` vuelve a publicar automáticamente.
+4. En Supabase → **Authentication → URL Configuration**: pon la URL de Vercel como *Site URL*
+   y añade `https://tu-proyecto.vercel.app/**` a *Redirect URLs* (deja también la de localhost).
+
+**Invitar:** envía `https://tu-proyecto.vercel.app/registro?codigo=PAELLA2026` (el código ya va relleno).
+
+**Modo privado:** sin sesión solo se ve la pantalla de entrar/registrarse; los buscadores no la indexan.
+Para cambiar el código o abrir la web al público, cambia o quita las variables en Vercel
+(Settings → Environment Variables) y vuelve a desplegar (Deployments → ⋯ → Redeploy).
 
 ## Usuarios y roles
 
@@ -38,7 +55,7 @@ Cuentas con email y contraseña (Supabase Auth). Registro libre en `/registro`.
 
 | Rol | Puede |
 |---|---|
-| Visitante sin cuenta | Buscar recetas |
+| Visitante sin cuenta | Buscar recetas (en modo privado: nada, solo entrar o registrarse) |
 | **Básico** (toda cuenta nueva) | Buscar recetas |
 | **Administrador** | Todo, incluido el panel `/admin` |
 

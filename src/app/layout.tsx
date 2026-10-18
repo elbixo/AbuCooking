@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Geist } from "next/font/google";
 import { signOut } from "./auth/actions";
 import { getCurrentUser } from "@/lib/auth";
+import { isPrivateMode } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -10,10 +11,14 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "AbuCooking — ¿Qué cocino hoy?",
-  description: "Dinos qué ingredientes tienes en casa y te proponemos recetas.",
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: "AbuCooking — ¿Qué cocino hoy?",
+    description: "Dinos qué ingredientes tienes en casa y te proponemos recetas.",
+    // En modo privado, que los buscadores no la indexen
+    robots: isPrivateMode() ? { index: false, follow: false } : undefined,
+  };
+}
 
 export default async function RootLayout({
   children,

@@ -3,9 +3,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { safeNext } from "@/lib/auth";
+import { isValidInvite } from "@/lib/site";
 import { createSessionClient } from "@/lib/supabase-server";
 
-export type AuthState = { error?: string; message?: string; email?: string };
+export type AuthState = { error?: string; message?: string; email?: string; invite?: string };
 
 // Mensajes de Supabase Auth traducidos
 function translate(message: string): string {
@@ -43,8 +44,12 @@ async function origin(): Promise<string> {
 
 export async function signUp(_prev: AuthState, form: FormData): Promise<AuthState> {
   const email = String(form.get("email") ?? "").trim();
+  const invite = String(form.get("invite") ?? "");
+  if (!isValidInvite(invite)) {
+    return { error: "El código de invitación no es correcto. Pídeselo a quien te invitó.", email, invite };
+  }
   const { password, error: invalid } = checkNewPassword(form);
-  if (invalid) return { error: invalid, email };
+  if (invalid) return { error: invalid, email, invite };
 
   const supabase = await createSessionClient();
   const { data, error } = await supabase.auth.signUp({
@@ -52,7 +57,7 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
     password,
     options: { emailRedirectTo: `${await origin()}/auth/callback` },
   });
-  if (error) return { error: translate(error.message), email };
+  if (error) return { error: translate(error.message), email, invite };
 
   // Si Supabase exige confirmar el email, no hay sesión todavía
   if (!data.session) {

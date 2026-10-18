@@ -4,9 +4,16 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { signIn, signUp, type AuthState } from "@/app/auth/actions";
 
-type Props = { mode: "login" | "register"; next?: string; initialError?: string };
+type Props = {
+  mode: "login" | "register";
+  next?: string;
+  initialError?: string;
+  // Registro: mostrar el campo de código de invitación (y su valor del enlace, si viene)
+  askInvite?: boolean;
+  invite?: string;
+};
 
-export default function AuthForm({ mode, next, initialError }: Props) {
+export default function AuthForm({ mode, next, initialError, askInvite, invite }: Props) {
   const isLogin = mode === "login";
   const [state, action, pending] = useActionState<AuthState, FormData>(isLogin ? signIn : signUp, {
     error: initialError,
@@ -19,6 +26,18 @@ export default function AuthForm({ mode, next, initialError }: Props) {
   return (
     <form action={action} className="card space-y-4">
       {next && <input type="hidden" name="next" value={next} />}
+      {!isLogin && askInvite && (
+        <label className="block text-sm">
+          Código de invitación
+          <input
+            name="invite"
+            required
+            autoComplete="off"
+            defaultValue={state.invite ?? invite}
+            className="input mt-1 uppercase"
+          />
+        </label>
+      )}
       <label className="block text-sm">
         Email
         <input
