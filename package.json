@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "importar-recetas": "node --env-file=.env.local scripts/importar-recetas.mjs"
+    "importar-recetas": "node --env-file=.env.local scripts/importar-recetas.mjs",
+    "importar-recetas:prueba": "node --env-file=.env.local scripts/importar-recetas.mjs --prueba",
+    "importar-recetas:actualizar": "node --env-file=.env.local scripts/importar-recetas.mjs --actualizar"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

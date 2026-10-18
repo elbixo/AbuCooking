@@ -133,9 +133,9 @@ En `data/recetas/` hay 142 recetas típicas españolas (tapas, cuchara, arroces,
 verduras y masas, postres) y en `data/ingredientes.mjs` sus ingredientes en español, francés e inglés.
 
 ```powershell
-npm run importar-recetas -- --prueba   # comprueba los datos y muestra qué haría, sin escribir
-npm run importar-recetas               # importa las recetas nuevas
-npm run importar-recetas -- --actualizar  # sobrescribe también las que ya existen
+npm run importar-recetas:prueba       # comprueba los datos y muestra qué haría, sin escribir
+npm run importar-recetas              # importa las recetas nuevas
+npm run importar-recetas:actualizar  # sobrescribe también las que ya existen
 ```
 - Reutiliza los ingredientes existentes (por slug o nombre en español) y crea los que falten.
   A los existentes solo les añade las traducciones que les falten.

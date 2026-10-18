@@ -1,8 +1,8 @@
 // Importa recetas (y los ingredientes que falten) desde data/ a Supabase.
 //
 //   npm run importar-recetas              -> importa las recetas nuevas
-//   npm run importar-recetas -- --prueba  -> solo comprueba y muestra qué haría
-//   npm run importar-recetas -- --actualizar
+//   npm run importar-recetas:prueba      -> solo comprueba y muestra qué haría
+//   npm run importar-recetas:actualizar
 //                                          -> además sobrescribe las recetas que ya existen
 //                                             (conserva sus traducciones al francés e inglés)
 //
