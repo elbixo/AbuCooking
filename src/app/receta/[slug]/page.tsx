@@ -1,20 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRecipe, parseIds } from "@/lib/data";
+import { getRecipe, parseIds, searchQuery } from "@/lib/data";
 import { formatQuantity } from "@/lib/text";
 
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ i?: string | string[] }>;
+  searchParams: Promise<{ i?: string | string[]; solo?: string }>;
 };
 
 export default async function RecipePage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const have = new Set(parseIds((await searchParams).i));
+  const query = await searchParams;
+  const have = new Set(parseIds(query.i));
   const recipe = await getRecipe(slug);
   if (!recipe) notFound();
 
-  const backHref = have.size ? `/?i=${[...have].join(",")}` : "/";
+  const backHref = `/${searchQuery(have, query.solo === "1")}`;
 
   return (
     <article className="mx-auto max-w-3xl">

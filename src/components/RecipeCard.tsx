@@ -23,11 +23,24 @@ export default function RecipeCard({ recipe, query }: { recipe: RecipeMatch; que
         </div>
         {recipe.description && <p className="mt-1 text-sm text-stone-600">{recipe.description}</p>}
 
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-stone-100">
+        {/* Parte de los ingredientes necesarios (sin básicos ni opcionales) que ya tienes */}
+        <div className="mt-4 flex items-center gap-3">
           <div
-            className={`h-full rounded-full ${complete ? "bg-green-500" : "bg-orange-400"}`}
-            style={{ width: `${pct}%` }}
-          />
+            className="h-2 flex-1 overflow-hidden rounded-full bg-stone-100"
+            role="meter"
+            aria-valuemin={0}
+            aria-valuemax={recipe.total}
+            aria-valuenow={recipe.matched}
+            aria-label="Ingredientes que tienes"
+          >
+            <div
+              className={`h-full rounded-full ${complete ? "bg-green-500" : "bg-orange-400"}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <span className="shrink-0 text-xs font-medium text-stone-500">
+            Tienes {recipe.matched} de {recipe.total}
+          </span>
         </div>
         <p className="mt-2 text-sm">
           {complete ? (

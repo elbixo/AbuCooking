@@ -2,20 +2,22 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Ingredient } from "@/lib/data";
+import { searchQuery, type Ingredient } from "@/lib/data";
 import { normalize } from "@/lib/text";
 
 type Props = {
   ingredients: Ingredient[];
   initialSelected: number[];
+  initialOnlyComplete: boolean;
 };
 
-export default function IngredientPicker({ ingredients, initialSelected }: Props) {
+export default function IngredientPicker({ ingredients, initialSelected, initialOnlyComplete }: Props) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<number[]>(initialSelected);
   const [query, setQuery] = useState("");
   const [highlight, setHighlight] = useState(0);
+  const [onlyComplete, setOnlyComplete] = useState(initialOnlyComplete);
 
   const byId = useMemo(() => new Map(ingredients.map((i) => [i.id, i])), [ingredients]);
 
@@ -46,8 +48,14 @@ export default function IngredientPicker({ ingredients, initialSelected }: Props
     setSelected((prev) => prev.filter((x) => x !== id));
   }
 
-  function search() {
-    router.push(selected.length ? `/?i=${selected.join(",")}` : "/");
+  function search(only = onlyComplete) {
+    router.push(`/${searchQuery(selected, only)}`);
+  }
+
+  // Si ya hay ingredientes, cambiar la casilla relanza la búsqueda
+  function toggleOnlyComplete(value: boolean) {
+    setOnlyComplete(value);
+    if (selected.length) search(value);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -128,9 +136,26 @@ export default function IngredientPicker({ ingredients, initialSelected }: Props
         )}
       </div>
 
+      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3">
+        <input
+          type="checkbox"
+          checked={onlyComplete}
+          onChange={(e) => toggleOnlyComplete(e.target.checked)}
+          className="mt-0.5 h-5 w-5 accent-orange-500"
+        />
+        <span>
+          <span className="block font-medium text-stone-900">Solo con lo que tengo</span>
+          <span className="block text-sm text-stone-500">
+            {onlyComplete
+              ? "Solo recetas que puedes hacer sin comprar nada."
+              : "Incluye recetas a las que les falta algún ingrediente."}
+          </span>
+        </span>
+      </label>
+
       <button
         type="button"
-        onClick={search}
+        onClick={() => search()}
         disabled={selected.length === 0}
         className="mt-4 w-full rounded-2xl bg-orange-500 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-stone-300 sm:w-auto"
       >

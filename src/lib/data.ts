@@ -48,11 +48,13 @@ export async function listIngredients(): Promise<Ingredient[]> {
   return data;
 }
 
-export async function searchRecipes(ingredientIds: number[]): Promise<RecipeMatch[]> {
+// onlyComplete: solo recetas que se pueden hacer sin comprar nada
+export async function searchRecipes(ingredientIds: number[], onlyComplete = false): Promise<RecipeMatch[]> {
   if (ingredientIds.length === 0) return [];
   const { data, error } = await supabase.rpc("search_recipes", {
     p_ingredient_ids: ingredientIds,
     p_locale: LOCALE,
+    p_only_complete: onlyComplete,
   });
   if (error) throw error;
   return data;
@@ -62,6 +64,13 @@ export async function getRecipe(slug: string): Promise<RecipeDetail | null> {
   const { data, error } = await supabase.rpc("get_recipe", { p_slug: slug, p_locale: LOCALE });
   if (error) throw error;
   return data;
+}
+
+// Query string de una búsqueda: "?i=3,7,12" (+ "&solo=1" si es solo con lo que tengo)
+export function searchQuery(ids: Iterable<number>, onlyComplete: boolean): string {
+  const list = [...ids];
+  if (list.length === 0) return "";
+  return `?i=${list.join(",")}${onlyComplete ? "&solo=1" : ""}`;
 }
 
 // "?i=3,7,12" -> [3, 7, 12]
