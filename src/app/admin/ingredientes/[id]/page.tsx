@@ -27,6 +27,12 @@ export default async function IngredientDetail({ params }: { params: Promise<{ i
       </div>
 
       <section>
+        <h2 className="mb-3 text-lg font-semibold text-stone-900">Editar ingrediente</h2>
+        <div className="card">
+          <IngredientEditor initial={ingredient} />
+        </div>
+      </section>
+      <section>
         <h2 className="mb-3 text-lg font-semibold text-stone-900">
           Recetas que lo usan ({ingredient.recipes.length})
         </h2>
@@ -58,12 +64,6 @@ export default async function IngredientDetail({ params }: { params: Promise<{ i
         )}
       </section>
 
-      <section>
-        <h2 className="mb-3 text-lg font-semibold text-stone-900">Editar ingrediente</h2>
-        <div className="card">
-          <IngredientEditor initial={ingredient} />
-        </div>
-      </section>
     </div>
   );
 }
