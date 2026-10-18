@@ -128,6 +128,21 @@ src/
 La búsqueda (`search_recipes`) trabaja con IDs de ingredientes, así que no depende del idioma.
 Ordena por el % de ingredientes necesarios que tienes, sin contar básicos ni opcionales.
 
+### Importar muchas recetas de golpe
+En `data/recetas/` hay 142 recetas típicas españolas (tapas, cuchara, arroces, carnes, pescados,
+verduras y masas, postres) y en `data/ingredientes.mjs` sus ingredientes en español, francés e inglés.
+
+```powershell
+npm run importar-recetas -- --prueba   # comprueba los datos y muestra qué haría, sin escribir
+npm run importar-recetas               # importa las recetas nuevas
+npm run importar-recetas -- --actualizar  # sobrescribe también las que ya existen
+```
+- Reutiliza los ingredientes existentes (por slug o nombre en español) y crea los que falten.
+  A los existentes solo les añade las traducciones que les falten.
+- No duplica nada: las recetas con un slug que ya existe no se tocan (salvo `--actualizar`,
+  que conserva su foto y sus traducciones).
+- Para añadir más, crea otro archivo en `data/recetas/` con el mismo formato.
+
 ### Añadir recetas
 Desde `/admin`. Las traducciones al francés e inglés se guardan ya, aunque la web pública
 de momento solo muestra español.
