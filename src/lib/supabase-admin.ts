@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
-import type { AdminIngredient, AdminIngredientDetail, AdminRecipe, AdminRecipeSummary } from "./admin";
+import type { AdminIngredient, AdminIngredientDetail, AdminRecipe, AdminRecipeSummary, AdminUser, Role } from "./admin";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -30,6 +30,9 @@ export const adminDb = {
   saveRecipe: (p: unknown) => rpc<number>("admin_save_recipe", { p }),
   deleteRecipe: (id: number) => rpc<null>("admin_delete_recipe", { p_id: id }),
   deleteIngredient: (id: number) => rpc<null>("admin_delete_ingredient", { p_id: id }),
+  userRole: (userId: string) => rpc<Role | null>("user_role", { p_user_id: userId }),
+  listUsers: () => rpc<AdminUser[]>("admin_list_users"),
+  setRole: (userId: string, role: Role) => rpc<null>("admin_set_role", { p_user_id: userId, p_role: role }),
 };
 
 const BUCKET = "recipe-images";

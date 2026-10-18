@@ -1,19 +1,20 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { isAdmin } from "@/lib/auth";
 import { adminDb, adminStorage } from "@/lib/supabase-admin";
 import {
   IMAGE_MAX_BYTES,
   LOCALES,
-  adminEnabled,
   type ActionResult,
   type AdminIngredient,
   type IngredientInput,
   type RecipeInput,
+  type Role,
 } from "@/lib/admin";
 
 async function run<T>(fn: () => Promise<T>): Promise<ActionResult<T>> {
-  if (!adminEnabled()) return { ok: false, error: "La administración está desactivada." };
+  if (!(await isAdmin())) return { ok: false, error: "No tienes permiso de administrador." };
   try {
     const data = await fn();
     revalidatePath("/", "layout");
@@ -76,4 +77,8 @@ export async function uploadRecipeImage(formData: FormData): Promise<ActionResul
 
 export async function deleteIngredient(id: number): Promise<ActionResult<null>> {
   return run(() => adminDb.deleteIngredient(id));
+}
+
+export async function setUserRole(userId: string, role: Role): Promise<ActionResult<null>> {
+  return run(() => adminDb.setRole(userId, role));
 }

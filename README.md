@@ -11,8 +11,8 @@ Dinos qué ingredientes tienes en casa y te proponemos recetas.
 2. Abre **SQL Editor** → **New query**, pega el contenido de
    `supabase/migrations/20261018000000_init.sql` y pulsa **Run**.
 3. Abre otra query, pega `supabase/seed.sql` y pulsa **Run**.
-4. Haz lo mismo con `supabase/migrations/20261019000000_admin.sql` y `supabase/migrations/20261020000000_images.sql`
-   (esta última crea el bucket `recipe-images` de Storage para las fotos).
+4. Haz lo mismo, en orden, con el resto de archivos de `supabase/migrations/`
+   (`…_admin.sql`, `…_images.sql`, `…_users.sql`).
 5. En **Project Settings → API Keys** copia la *Project URL*, la clave *publishable* (o *anon*) y la clave *secret* (o *service_role*).
 
 > Cada vez que se añada un archivo nuevo en `supabase/migrations/`, ejecútalo igual en el SQL Editor (en orden).
@@ -32,22 +32,43 @@ Abre http://localhost:3000
 2. Añade las variables `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 3. **Deploy**. Cada `git push` a `main` vuelve a publicar automáticamente.
 
+## Usuarios y roles
+
+Cuentas con email y contraseña (Supabase Auth). Registro libre en `/registro`.
+
+| Rol | Puede |
+|---|---|
+| Visitante sin cuenta | Buscar recetas |
+| **Básico** (toda cuenta nueva) | Buscar recetas |
+| **Administrador** | Todo, incluido el panel `/admin` |
+
+**Primer administrador:** regístrate en la web y ejecuta en el SQL Editor de Supabase:
+```sql
+update profile set role = 'admin' where email = 'tu@email.com';
+```
+A partir de ahí, los demás se nombran desde `/admin/usuarios` (siempre debe quedar al menos uno).
+
+**Configuración de Supabase** (Authentication):
+- **URL Configuration**: *Site URL* `http://localhost:3000` (en producción, tu dominio) y en *Redirect URLs*
+  añade `http://localhost:3000/**` (y `https://tu-dominio/**` cuando publiques).
+- **Sign In / Providers → Email**: con *Confirm email* activado, cada cuenta nueva recibe un email de confirmación.
+  El servidor de correo gratuito de Supabase solo envía unos pocos emails por hora; para desarrollar
+  puedes desactivarlo y las cuentas quedarán activas al momento.
+
 ## Panel de administración
 
-En local (`npm run dev`) tienes `/admin` (enlace "Administración" arriba a la derecha):
+En `/admin` (enlace "Administración" arriba a la derecha, solo visible para administradores):
 
 - **Recetas**: buscar, ordenar (título, nº de ingredientes, tiempo), crear, editar y borrar.
   Título, descripción y pasos en español (obligatorio), francés e inglés. Imagen opcional.
 - **Ingredientes**: buscar, ordenar por nombre en cualquiera de los 3 idiomas o por nº de recetas.
-  Al pulsar uno se ven las recetas que lo usan y se puede editar (nombre y sinónimos en los 3 idiomas).
+  Al pulsar uno se puede editar (nombre y sinónimos en los 3 idiomas) y se ven las recetas que lo usan.
+- **Usuarios**: lista de cuentas y botón para hacer / quitar administrador.
 - **Imágenes**: el navegador las reduce a 800 px en WebP antes de subirlas (normalmente 30-100 KB;
   máximo 512 KB). Se guardan en Supabase Storage y se borran al cambiarlas o al borrar la receta.
-- Al añadir ingredientes a una receta se busca entre los existentes (en cualquier idioma o sinónimo).
-  Si no existe, ofrece **«+ Crear ingrediente»** y lo da de alta sin salir de la receta.
 
-⚠️ Todavía **no tiene autenticación**. Por eso solo funciona en desarrollo: en producción `/admin` devuelve 404
-(salvo que se defina `ADMIN_ENABLED=true`, que no debe hacerse hasta tener login).
-Escribe en la base de datos desde el servidor con `SUPABASE_SERVICE_ROLE_KEY`, que nunca llega al navegador.
+Seguridad: cada página y cada acción del panel comprueba en el servidor que el usuario es administrador.
+Las escrituras usan `SUPABASE_SERVICE_ROLE_KEY`, que solo existe en el servidor (nunca llega al navegador).
 
 ## Cómo está organizado
 
@@ -59,10 +80,13 @@ src/
   app/page.tsx            Buscador + resultados (lee ?i=1,2,3 de la URL)
   app/receta/[slug]/      Detalle de receta, marca lo que tienes y lo que falta
   app/admin/              Panel de administración (+ actions.ts: server actions)
+  app/login, app/registro Entrar y crear cuenta (app/auth: acciones y callback del email)
+  middleware.ts           Refresca la sesión de Supabase en cada petición
   components/             Selector de ingredientes y tarjeta de receta
   components/admin/       Formularios de receta e ingrediente
   lib/data.ts             Lectura pública (clave publishable)
   lib/supabase-admin.ts   Lectura/escritura de admin (clave secreta, solo servidor)
+  lib/auth.ts             Usuario actual y su rol; protección de páginas de admin
 ```
 
 ### Modelo de datos

@@ -75,11 +75,14 @@ export const IMAGE_MAX_BYTES = 512 * 1024;
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
 
-// Sin autenticación todavía: el panel solo funciona en local (npm run dev),
-// salvo que se active explícitamente con ADMIN_ENABLED=true.
-export function adminEnabled(): boolean {
-  return process.env.NODE_ENV !== "production" || process.env.ADMIN_ENABLED === "true";
-}
+export type Role = "admin" | "user";
+
+export type AdminUser = {
+  id: string;
+  email: string;
+  role: Role;
+  created_at: string;
+};
 
 export function ingredientLabel(i: Pick<AdminIngredient, "slug" | "translations">): string {
   return i.translations.es?.name ?? i.translations.en?.name ?? i.translations.fr?.name ?? i.slug;

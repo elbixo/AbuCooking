@@ -2,16 +2,22 @@ import IngredientPicker from "@/components/IngredientPicker";
 import RecipeCard from "@/components/RecipeCard";
 import { listIngredients, parseIds, searchRecipes } from "@/lib/data";
 
-type Props = { searchParams: Promise<{ i?: string | string[] }> };
+type Props = { searchParams: Promise<{ i?: string | string[]; aviso?: string }> };
 
 export default async function Home({ searchParams }: Props) {
-  const selected = parseIds((await searchParams).i);
+  const params = await searchParams;
+  const selected = parseIds(params.i);
   const [ingredients, recipes] = await Promise.all([listIngredients(), searchRecipes(selected)]);
   const pantry = ingredients.filter((i) => i.is_pantry).map((i) => i.name);
   const query = selected.length ? `?i=${selected.join(",")}` : "";
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
+      {params.aviso === "sin-permiso" && (
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Esa sección es solo para administradores.
+        </p>
+      )}
       <section>
         <h1 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">¿Qué tienes en la nevera?</h1>
         <p className="mt-2 text-stone-600">
