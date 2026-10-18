@@ -23,6 +23,17 @@ export type RecipeMatch = {
   missing: string[];
 };
 
+// Datos básicos de una receta para listados (búsqueda por texto, favoritas)
+export type RecipeSummary = {
+  id: number;
+  slug: string;
+  title: string;
+  description: string | null;
+  prep_minutes: number | null;
+  servings: number | null;
+  image_url: string | null;
+};
+
 export type RecipeDetail = {
   id: number;
   slug: string;
@@ -56,6 +67,13 @@ export async function searchRecipes(ingredientIds: number[], onlyComplete = fals
     p_locale: LOCALE,
     p_only_complete: onlyComplete,
   });
+  if (error) throw error;
+  return data;
+}
+
+// Búsqueda por texto en título, descripción, ingredientes y pasos (sin texto: todas)
+export async function searchRecipesText(query: string): Promise<RecipeSummary[]> {
+  const { data, error } = await supabase.rpc("search_recipes_text", { p_query: query, p_locale: LOCALE });
   if (error) throw error;
   return data;
 }

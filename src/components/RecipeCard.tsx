@@ -20,13 +20,13 @@ export default function RecipeCard({ recipe, query, favorite, loggedIn }: Props)
         <img src={recipe.image_url} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
       )}
       <div className="absolute right-3 top-3 z-10">
-        <FavoriteButton recipeId={recipe.id} initial={favorite} loggedIn={loggedIn} />
+        <FavoriteButton recipeId={recipe.id} recipeTitle={recipe.title} initial={favorite} loggedIn={loggedIn} />
       </div>
       <div className="p-5">
         <div className={`flex items-start justify-between gap-3 ${recipe.image_url ? "" : "pr-10"}`}>
           {/* El enlace cubre toda la tarjeta (after:inset-0) salvo el corazón, que queda por encima */}
           <h3 className="text-lg font-semibold text-stone-900">
-            <Link href={`/receta/${recipe.slug}${query}`} className="after:absolute after:inset-0">
+            <Link href={`/receta/${recipe.slug}${query}`} prefetch={false} className="after:absolute after:inset-0">
               {recipe.title}
             </Link>
           </h3>

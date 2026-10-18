@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useConfirm } from "./ui/ConfirmProvider";
 import { toggleFavorite } from "@/app/favoritas/actions";
 
 type Props = {
   recipeId: number;
+  recipeTitle: string;
   initial: boolean;
   loggedIn: boolean;
   size?: "sm" | "lg";
@@ -13,16 +15,20 @@ type Props = {
   onRemoved?: () => void;
 };
 
-// Corazón para guardar/quitar una receta de favoritas.
-// Cambia al instante y, si falla en el servidor, vuelve atrás.
-export default function FavoriteButton({ recipeId, initial, loggedIn, size = "sm", onRemoved }: Props) {
+// Corazón para guardar/quitar una receta de favoritas, con confirmación.
+// Tras confirmar cambia al instante y, si falla en el servidor, vuelve atrás.
+export default function FavoriteButton({ recipeId, recipeTitle, initial, loggedIn, size = "sm", onRemoved }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const confirm = useConfirm();
   const [favorite, setFavorite] = useState(initial);
   const [pending, startTransition] = useTransition();
 
-  function onClick(e: React.MouseEvent) {
+  // Si la página se vuelve a pintar con datos nuevos del servidor, manda lo guardado
+  useEffect(() => setFavorite(initial), [initial]);
+
+  async function onClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (!loggedIn) {
@@ -30,6 +36,18 @@ export default function FavoriteButton({ recipeId, initial, loggedIn, size = "sm
       router.push(`/login?next=${encodeURIComponent(here)}`);
       return;
     }
+    const ok = await confirm({
+      title: favorite ? "¿Quitar de favoritas?" : "¿Añadir a favoritas?",
+      message: favorite
+        ? `«${recipeTitle}» dejará de estar en Mis favoritas.`
+        : `«${recipeTitle}» se guardará en Mis favoritas.`,
+      confirmLabel: favorite ? "Quitar" : "Añadir",
+      danger: favorite,
+    });
+    if (ok) apply();
+  }
+
+  function apply() {
     const next = !favorite;
     setFavorite(next);
     startTransition(async () => {
@@ -37,8 +55,9 @@ export default function FavoriteButton({ recipeId, initial, loggedIn, size = "sm
       if (!res.ok) {
         setFavorite(!next);
         alert(res.error);
-      } else if (!next) {
-        onRemoved?.();
+      } else {
+        if (!next) onRemoved?.();
+        router.refresh();
       }
     });
   }

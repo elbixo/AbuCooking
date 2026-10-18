@@ -59,7 +59,9 @@ Cuentas con email y contraseña (Supabase Auth). Registro libre en `/registro`.
 | **Básico** (toda cuenta nueva) | Buscar recetas y guardar favoritas |
 | **Administrador** | Todo, incluido el panel `/admin` |
 
-- **Mis favoritas** (`/favoritas`): el corazón de cada receta la guarda en la cuenta del usuario.
+- **Secciones**: **¡A cocinar!** (`/`, buscar por ingredientes que tienes), **Buscar recetas**
+  (`/buscar`, por texto en título, descripción, ingredientes y pasos) y **Mis favoritas**.
+- **Mis favoritas** (`/favoritas`): el corazón de cada receta la guarda (pide confirmación).
   Cada usuario solo puede ver y cambiar las suyas (RLS en la tabla `favorite`).
 - **Mi cuenta** (`/cuenta`, pulsando tu email arriba): ver tu tipo de cuenta y cambiar la contraseña
   (pide la actual).
